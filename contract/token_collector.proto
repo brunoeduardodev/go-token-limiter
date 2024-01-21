@@ -1,11 +1,15 @@
+syntax = "proto3";
+
+option go_package="github.com/brunoeduardodev/go-token-limiter/contracts/token_collector";
+
 service TokenCollector {
   rpc InsertToken (InsertTokenRequest) returns (InsertTokenReply) {}
 }
 
 message InsertTokenRequest {
-  required string userId = 1;
+  string userId = 1;
 }
 
 message InsertTokenReply {
-  required bool success = 1; 
+  bool success = 1; 
 }
