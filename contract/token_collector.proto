@@ -1,0 +1,11 @@
+service TokenCollector {
+  rpc InsertToken (InsertTokenRequest) returns (InsertTokenReply) {}
+}
+
+message InsertTokenRequest {
+  required string userId = 1;
+}
+
+message InsertTokenReply {
+  required bool success = 1; 
+}
