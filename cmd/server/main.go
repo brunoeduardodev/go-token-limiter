@@ -28,6 +28,21 @@ func (s *server) InsertToken(ctx context.Context, req *token_collector.InsertTok
 	return &token_collector.InsertTokenReply{Success: false}, nil
 }
 
+func (s *server) GetBucketInformation(ctx context.Context, req *token_collector.GetBucketInformationRequest) (*token_collector.GetBucketInformationReply, error) {
+	bucket, err := s.tokenMachine.GetBucketInformation(req.UserId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &token_collector.GetBucketInformationReply{
+		Tokens:        float32(bucket.Tokens),
+		LastAccess:    bucket.LastAccess,
+		TotalAttempts: bucket.TotalAttempts,
+	}, nil
+
+}
+
 func main() {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 
@@ -38,7 +53,7 @@ func main() {
 	s := grpc.NewServer()
 
 	token_collector.RegisterTokenCollectorServer(s, &server{
-		tokenMachine: *token_bucket.MakeTokenMachine(5, 5),
+		tokenMachine: *token_bucket.MakeTokenMachine(50, 10),
 	})
 
 	err = s.Serve(listener)

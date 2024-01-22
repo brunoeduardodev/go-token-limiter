@@ -4,10 +4,21 @@ option go_package="github.com/brunoeduardodev/go-token-limiter/contracts/token_c
 
 service TokenCollector {
   rpc InsertToken (InsertTokenRequest) returns (InsertTokenReply) {}
+  rpc GetBucketInformation (GetBucketInformationRequest) returns (GetBucketInformationReply) {}
 }
 
 message InsertTokenRequest {
   string userId = 1;
+}
+
+message GetBucketInformationRequest {
+  string userId = 1;
+}
+
+message GetBucketInformationReply {
+  float tokens = 1;
+  int64 lastAccess = 2;
+  int64 totalAttempts = 3;
 }
 
 message InsertTokenReply {

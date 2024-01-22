@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TokenCollectorClient interface {
 	InsertToken(ctx context.Context, in *InsertTokenRequest, opts ...grpc.CallOption) (*InsertTokenReply, error)
+	GetBucketInformation(ctx context.Context, in *GetBucketInformationRequest, opts ...grpc.CallOption) (*GetBucketInformationReply, error)
 }
 
 type tokenCollectorClient struct {
@@ -42,11 +43,21 @@ func (c *tokenCollectorClient) InsertToken(ctx context.Context, in *InsertTokenR
 	return out, nil
 }
 
+func (c *tokenCollectorClient) GetBucketInformation(ctx context.Context, in *GetBucketInformationRequest, opts ...grpc.CallOption) (*GetBucketInformationReply, error) {
+	out := new(GetBucketInformationReply)
+	err := c.cc.Invoke(ctx, "/TokenCollector/GetBucketInformation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TokenCollectorServer is the server API for TokenCollector service.
 // All implementations must embed UnimplementedTokenCollectorServer
 // for forward compatibility
 type TokenCollectorServer interface {
 	InsertToken(context.Context, *InsertTokenRequest) (*InsertTokenReply, error)
+	GetBucketInformation(context.Context, *GetBucketInformationRequest) (*GetBucketInformationReply, error)
 	mustEmbedUnimplementedTokenCollectorServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedTokenCollectorServer struct {
 
 func (UnimplementedTokenCollectorServer) InsertToken(context.Context, *InsertTokenRequest) (*InsertTokenReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InsertToken not implemented")
+}
+func (UnimplementedTokenCollectorServer) GetBucketInformation(context.Context, *GetBucketInformationRequest) (*GetBucketInformationReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBucketInformation not implemented")
 }
 func (UnimplementedTokenCollectorServer) mustEmbedUnimplementedTokenCollectorServer() {}
 
@@ -88,6 +102,24 @@ func _TokenCollector_InsertToken_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TokenCollector_GetBucketInformation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBucketInformationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TokenCollectorServer).GetBucketInformation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/TokenCollector/GetBucketInformation",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TokenCollectorServer).GetBucketInformation(ctx, req.(*GetBucketInformationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TokenCollector_ServiceDesc is the grpc.ServiceDesc for TokenCollector service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var TokenCollector_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InsertToken",
 			Handler:    _TokenCollector_InsertToken_Handler,
+		},
+		{
+			MethodName: "GetBucketInformation",
+			Handler:    _TokenCollector_GetBucketInformation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
